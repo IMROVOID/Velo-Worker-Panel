@@ -28,41 +28,32 @@ const failure = `${red}✗${reset}`;
 
 const version = pkg.version;
 
-async function processHtmlPages() {
-    const indexFiles = globSync('**/index.html', { cwd: ASSET_PATH });
+const FRONTEND_OUT_DIR = join(__dirname, '../src/frontend/out');
+
+async function processNextJsAssets() {
+    const assetFiles = globSync('**/*', { cwd: FRONTEND_OUT_DIR, nodir: true });
     const result = {};
 
-    for (const relativeIndexPath of indexFiles) {
-        const dir = pathDirname(relativeIndexPath);
-        const base = (file) => join(ASSET_PATH, dir, file);
+    for (const relativePath of assetFiles) {
+        const fullPath = join(FRONTEND_OUT_DIR, relativePath);
+        const fileContent = readFileSync(fullPath);
 
-        const indexHtml = readFileSync(base('index.html'), 'utf8');
-        let finalHtml = indexHtml.replaceAll('__VERSION__', version);
+        const compressed = gzipSync(fileContent);
+        const base64 = compressed.toString('base64');
 
-        if (dir !== 'error') {
-            const styleCode = readFileSync(base('style.css'), 'utf8');
-            const scriptCode = readFileSync(base('script.js'), 'utf8');
-            const finalScriptCode = await jsMinify(scriptCode);
-            finalHtml = finalHtml
-                .replaceAll('__STYLE__', `<style>${styleCode}</style>`)
-                .replaceAll('__SCRIPT__', finalScriptCode.code);
-        }
+        // Normalize path for web (forward slashes, start with /)
+        const webPath = '/' + relativePath.split(pathDirname(relativePath).split(pathDirname(relativePath)[0])[0]).join('/').replace(/\\/g, '/');
+        // Actually, just simple replacement is safer
+        const normalizedPath = '/' + relativePath.replace(/\\/g, '/');
 
-        const minifiedHtml = htmlMinify(finalHtml, {
-            collapseWhitespace: true,
-            removeAttributeQuotes: true,
-            minifyCSS: true
-        });
-
-        const compressed = gzipSync(minifiedHtml);
-        const htmlBase64 = compressed.toString('base64');
-        result[dir] = JSON.stringify(htmlBase64);
+        result[normalizedPath] = JSON.stringify(base64);
     }
 
-    console.log(`${success} Assets bundled successfuly!`);
+    console.log(`${success} Next.js assets bundled successfuly!`);
     return result;
 }
 
+// ... helper functions like generateJunkCode remain ...
 function generateJunkCode() {
     const minVars = 50, maxVars = 500;
     const minFuncs = 50, maxFuncs = 500;
@@ -86,9 +77,11 @@ function generateJunkCode() {
 
 async function buildWorker() {
 
-    const htmls = await processHtmlPages();
-    const faviconBuffer = readFileSync('./src/assets/favicon.ico');
-    const faviconBase64 = faviconBuffer.toString('base64');
+    // First, ensure frontend is built (optional, can be manual)
+    // For now we assume npm run build was run in src/frontend
+
+    const assets = await processNextJsAssets();
+    const assetsString = JSON.stringify(assets); // This might be huge, check size limits
 
     const code = await build({
         entryPoints: [join(__dirname, '../src/worker.ts')],
@@ -100,11 +93,7 @@ async function buildWorker() {
         target: 'esnext',
         loader: { '.ts': 'ts' },
         define: {
-            __PANEL_HTML_CONTENT__: htmls['panel'] ?? '""',
-            __LOGIN_HTML_CONTENT__: htmls['login'] ?? '""',
-            __ERROR_HTML_CONTENT__: htmls['error'] ?? '""',
-            __SECRETS_HTML_CONTENT__: htmls['secrets'] ?? '""',
-            __ICON__: JSON.stringify(faviconBase64),
+            __STATIC_ASSETS__: assetsString,
             __VERSION__: JSON.stringify(version)
         }
     });

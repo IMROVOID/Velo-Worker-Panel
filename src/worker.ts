@@ -1,8 +1,6 @@
 import { init, initHttp, initWs } from '@init';
 import {
 	fallback,
-	serveIcon,
-	renderSecrets,
 	handlePanel,
 	handleSubscriptions,
 	handleLogin,
@@ -39,14 +37,10 @@ export default {
 					case 'logout':
 						return logout();
 
-					case 'secrets':
-						return await renderSecrets();
-
-					case 'favicon.ico':
-						return await serveIcon();
-
 					case `dns-query`:
 						return await handleDoH(request);
+
+
 
 					default:
 						return await fallback(request);

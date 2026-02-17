@@ -168,6 +168,7 @@ declare global {
         format?: string;
     }
 
+    const __STATIC_ASSETS__: string;
     const __VERSION__: string;
     const __ERROR_HTML_CONTENT__: string;
     const __ICON__: string;

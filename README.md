@@ -40,6 +40,32 @@ This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE
 1. **UDP transport**: VLESS and Trojan protocols on workers do not handle **UDP** properly, so it is disabled by default (affecting features like Telegram video calls), UDP DNS is also unsupported. DoH is enabled by default for enhanced security.
 2. **Request limit**: each worker supports 100K requests per day for VLESS and Trojan, suitable for 2-3 users. You can use limitless Warp configs.
 
+## Development & Build
+
+### Frontend Development (Next.js)
+To run the frontend locally for UI development:
+```bash
+cd src/frontend
+npm install
+npm run dev
+```
+Open [http://localhost:3000/panel](http://localhost:3000/panel) to view the panel.
+
+### Worker Build (Production)
+To build the full project (Worker + bundled Frontend):
+```bash
+# In the root directory
+npm install
+node scripts/build.js
+```
+This generates `dist/worker.js` containing the logic and compressed static assets.
+
+### Deployment
+To deploy to Cloudflare Workers:
+```bash
+npx wrangler deploy
+```
+
 ## Getting started
 
 - [Installation methods](https://bia-pain-bache.github.io/BPB-Worker-Panel/installation/wizard/)

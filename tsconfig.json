@@ -1,9 +1,16 @@
 {
-    "include": ["src"],
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "src/frontend"
+    ],
     "compilerOptions": {
         "target": "esnext",
         "module": "esnext",
-        "types": ["@cloudflare/workers-types"],
+        "types": [
+            "@cloudflare/workers-types/2023-07-01"
+        ],
         "moduleResolution": "node",
         "baseUrl": "src",
         "strict": true,
@@ -13,16 +20,36 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "paths": {
-            "@xray/*": ["cores/xray/*"],
-            "@sing-box/*": ["cores/sing-box/*"],
-            "@clash/*": ["cores/clash/*"],
-            "@utils": ["cores/utils"],
-            "@handlers": ["common/handlers"],
-            "@init": ["common/init"],
-            "@common": ["common/common"],
-            "@vless": ["protocols/websocket/vless"],
-            "@trojan": ["protocols/websocket/trojan"],
-            "@warp": ["protocols/warp"]
+            "@xray/*": [
+                "cores/xray/*"
+            ],
+            "@sing-box/*": [
+                "cores/sing-box/*"
+            ],
+            "@clash/*": [
+                "cores/clash/*"
+            ],
+            "@utils": [
+                "cores/utils"
+            ],
+            "@handlers": [
+                "common/handlers"
+            ],
+            "@init": [
+                "common/init"
+            ],
+            "@common": [
+                "common/common"
+            ],
+            "@vless": [
+                "protocols/websocket/vless"
+            ],
+            "@trojan": [
+                "protocols/websocket/trojan"
+            ],
+            "@warp": [
+                "protocols/warp"
+            ]
         }
     }
 }

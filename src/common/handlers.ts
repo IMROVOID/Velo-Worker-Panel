@@ -39,55 +39,125 @@ export async function handleWebsocket(request: Request): Promise<Response> {
     }
 }
 
-export async function handlePanel(request: Request, env: Env): Promise<Response> {
-    const { pathName } = globalThis.globalConfig;
 
-    switch (pathName) {
-        case '/panel':
-            return await renderPanel(request, env);
+let staticAssets: Record<string, string> | null = null;
 
-        case '/panel/settings':
-            return await getSettings(request, env);
-
-        case '/panel/update-settings':
-            return await updateSettings(request, env);
-
-        case '/panel/reset-settings':
-            return await resetSettings(request, env);
-
-        case '/panel/reset-password':
-            return await resetPassword(request, env);
-
-        case '/panel/my-ip':
-            return await getMyIP(request);
-
-        case '/panel/update-warp':
-            return await updateWarpConfigs(request, env);
-
-        case '/panel/get-warp-configs':
-            return await getWarpConfigs(request, env);
-
-        default:
-            return await fallback(request);
+function getMimeType(path: string): string {
+    const ext = path.split('.').pop()?.toLowerCase();
+    switch (ext) {
+        case 'html': return 'text/html; charset=utf-8';
+        case 'css': return 'text/css; charset=utf-8';
+        case 'js': return 'application/javascript; charset=utf-8';
+        case 'json': return 'application/json; charset=utf-8';
+        case 'png': return 'image/png';
+        case 'jpg': case 'jpeg': return 'image/jpeg';
+        case 'svg': return 'image/svg+xml';
+        case 'ico': return 'image/x-icon';
+        case 'txt': return 'text/plain; charset=utf-8';
+        default: return 'application/octet-stream';
     }
+}
+
+export async function handlePanel(request: Request, env: Env): Promise<Response> {
+    if (!staticAssets) {
+        try {
+            // @ts-ignore
+            staticAssets = JSON.parse(__STATIC_ASSETS__);
+        } catch (e) {
+            console.error("Failed to parse static assets", e);
+            return new Response("Internal Server Error: Assets Corrupted", { status: 500 });
+        }
+    }
+
+    const url = new URL(request.url);
+    let pathname = url.pathname;
+
+    // Handle basePath stripping
+    // The worker might be receiving requests at /root/path/panel/...
+    // globalConfig.pathName is the configured path, e.g. /uuid/panel
+    // So we should verify if the request starts with this path.
+    // The request usually matches the worker route.
+
+    // Simpler approach: check if it starts with /panel (from next.config.ts)
+    // If we are serving from a subpath defined in globalConfig, we need to respect that.
+    // But for now, let's assume the request comes in as /.../panel/...
+
+    // If the pathName (config) is used for routing in worker.ts, we are here because a switch matched.
+    // We can try to look up the asset relative to the panel root.
+
+    // If pathName is "/secret/panel", and request is "/secret/panel/dashboard",
+    // we want "/dashboard.html".
+
+    const { pathName } = globalThis.globalConfig;
+    if (pathname.startsWith(pathName)) {
+        pathname = pathname.slice(pathName.length);
+    } else if (pathname.startsWith('/panel')) {
+        pathname = pathname.slice('/panel'.length);
+    }
+
+    if (pathname === '' || pathname === '/') {
+        pathname = '/index.html';
+    }
+
+    // Try exact match first
+    let assetKey = pathname;
+    if (staticAssets![assetKey]) {
+        // found
+    } else if (staticAssets![pathname + '.html']) {
+        // try adding .html (e.g. /dashboard -> /dashboard.html)
+        assetKey = pathname + '.html';
+    } else if (pathname.endsWith('/') && staticAssets![pathname + 'index.html']) {
+        assetKey = pathname + 'index.html';
+    } else {
+        // Not found
+        // If it's a navigation request, maybe 404.html?
+        if (staticAssets!['/404.html']) {
+            assetKey = '/404.html';
+            // We should probably return 404 status, but for SPA it might be different.
+            // Next.js static export: 404.html is just a page.
+        } else {
+            return new Response("Not Found", { status: 404 });
+        }
+    }
+
+    const contentBase64 = staticAssets![assetKey];
+    if (!contentBase64) {
+        return new Response("Not Found", { status: 404 });
+    }
+
+    const body = Uint8Array.from(atob(contentBase64), c => c.charCodeAt(0));
+
+    return new Response(body, {
+        headers: {
+            'Content-Type': getMimeType(assetKey),
+            'Content-Encoding': 'gzip',
+            'Cache-Control': 'public, max-age=86400',
+        },
+        status: assetKey === '/404.html' ? 404 : 200
+    });
 }
 
 export async function renderError(error: any): Promise<Response> {
     const message = error instanceof Error ? error.message : String(error);
-    const html = await decompressHtml(__ERROR_HTML_CONTENT__, true) as string;
-    const errorPage = html.replace('__ERROR_MESSAGE__', message);
-
-    return new Response(errorPage, {
+    // Use the bundled 404 or error page if available, or fallback to simple text
+    // for now just simple text to avoid complexity
+    return new Response(`Error: ${message}`, {
         status: HttpStatus.OK,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
     });
 }
 
+
 export async function handleLogin(request: Request, env: Env): Promise<Response> {
     const { pathName } = globalThis.globalConfig;
+    const { urlOrigin } = globalThis.httpConfig;
 
     if (pathName === '/login') {
-        return await renderLogin(request, env);
+        const auth = await Authenticate(request, env);
+        if (auth) {
+            return Response.redirect(`${urlOrigin}/panel`, 302);
+        }
+        return Response.redirect(`${urlOrigin}/panel/login`, 302);
     }
 
     if (pathName === '/login/authenticate') {
@@ -345,46 +415,9 @@ export async function serveIcon(): Promise<Response> {
     });
 }
 
-async function renderPanel(request: Request, env: Env): Promise<Response> {
-    const pwd = await env.kv.get('pwd');
 
-    if (pwd) {
-        const auth = await Authenticate(request, env);
-        if (!auth) {
-            const { urlOrigin } = globalThis.httpConfig;
-            return Response.redirect(`${urlOrigin}/login`, 302);
-        }
-    }
+// renderPanel, renderLogin, renderSecrets and decompressHtml removed as they are replaced by static asset serving
 
-    const html = await decompressHtml(__PANEL_HTML_CONTENT__, false);
-    return new Response(html, {
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
-    });
-}
-
-async function renderLogin(request: Request, env: Env): Promise<Response> {
-    const auth = await Authenticate(request, env);
-    if (auth) {
-        const { urlOrigin } = globalThis.httpConfig;
-        return Response.redirect(`${urlOrigin}/panel`, 302);
-    }
-
-    const html = await decompressHtml(__LOGIN_HTML_CONTENT__, false);
-    return new Response(html, {
-        headers: {
-            'Content-Type': 'text/html; charset=utf-8'
-        }
-    });
-}
-
-export async function renderSecrets(): Promise<Response> {
-    const html = await decompressHtml(__SECRETS_HTML_CONTENT__, false);
-    return new Response(html, {
-        headers: {
-            'Content-Type': 'text/html; charset=utf-8'
-        }
-    });
-}
 
 async function updateWarpConfigs(request: Request, env: Env): Promise<Response> {
     if (request.method === 'POST') {
