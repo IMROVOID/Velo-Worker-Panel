@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, ChevronRight, FileText, ArrowLeft, Terminal, Server, Shield, Globe, Database, Cpu } from "lucide-react";
+import { Search, ChevronRight, FileText, ArrowLeft, Server, Shield, Globe, Database, Cpu } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";

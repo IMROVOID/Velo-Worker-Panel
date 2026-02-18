@@ -1,8 +1,8 @@
 'use client';
 
-import { BarChart, Bar, ResponsiveContainer, YAxis } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { BarChart, Bar, ResponsiveContainer } from 'recharts';
+import { Card, CardContent } from '@/components/ui/card';
+
 
 // Mock Data
 const data = Array.from({ length: 20 }, () => ({

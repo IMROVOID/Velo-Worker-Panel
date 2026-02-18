@@ -11,8 +11,7 @@ import {
     Settings,
     Activity,
     FileText,
-    Shield,
-    LogOut
+    Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VeloSidebarIcon } from './icons/VeloSidebarIcon';
@@ -50,7 +49,8 @@ export default function Sidebar() {
     // Close sidebar on navigation on mobile
     useEffect(() => {
         if (isMobile) setIsOpen(false);
-    }, [pathname, isMobile]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname]);
 
     const sidebarWidth = isMobile ? (isOpen ? 256 : 0) : (isOpen ? 256 : 70);
 
@@ -128,7 +128,8 @@ export default function Sidebar() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        "flex items-center pl-5 pr-3 py-3 rounded-2xl transition-colors duration-200 group relative overflow-hidden text-sm",
+                                        "flex items-center py-3 rounded-2xl transition-colors duration-200 group relative overflow-hidden text-sm",
+                                        (isOpen || isMobile) ? "pl-5 pr-3 justify-start" : "justify-center px-2",
                                         isActive
                                             ? "bg-[var(--sidebar-selected)] text-foreground font-medium"
                                             : "text-muted-foreground/70 hover:bg-neutral-800/50 hover:text-foreground"
@@ -164,7 +165,8 @@ export default function Sidebar() {
                 {/* Footer / Logout */}
                 <div className="p-4 border-t border-border/10">
                     <button className={cn(
-                        "flex items-center w-full pl-5 pr-3 py-3 rounded-2xl text-muted-foreground/70 hover:bg-red-500/5 hover:text-red-500 transition-colors duration-200 text-sm group"
+                        "flex items-center w-full py-3 rounded-2xl text-muted-foreground/70 hover:bg-red-500/5 hover:text-red-500 transition-colors duration-200 text-sm group",
+                        (isOpen || isMobile) ? "pl-5 pr-3 justify-start" : "justify-center px-2"
                     )}>
                         <LogoutIcon className="w-5 h-5 min-w-[20px] shrink-0 group-hover:text-red-500" />
                         <motion.span
