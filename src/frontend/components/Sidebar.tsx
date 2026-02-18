@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Turn as Hamburger } from 'hamburger-react';
 import {
     LayoutDashboard,
@@ -50,21 +50,6 @@ export default function Sidebar() {
         if (isMobile) setIsOpen(false);
     }, [pathname, isMobile]);
 
-    const sidebarVariants: Variants = {
-        open: { x: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 30 } },
-        closed: { x: '-100%', opacity: 0, transition: { type: 'spring', stiffness: 300, damping: 30 } },
-    };
-
-    const desktopVariants: Variants = {
-        open: { width: '250px', transition: { type: 'spring', stiffness: 300, damping: 30 } },
-        closed: { width: '70px', transition: { type: 'spring', stiffness: 300, damping: 30 } }, // Smaller closed width
-    };
-
-    const titleVariants = {
-        open: { opacity: 1, width: "auto", transition: { duration: 0.2, delay: 0.1 } },
-        closed: { opacity: 0, width: 0, transition: { duration: 0.2 } }
-    };
-
     return (
         <>
             {/* Mobile Toggle Button */}
@@ -94,38 +79,41 @@ export default function Sidebar() {
             </AnimatePresence>
 
             {/* Sidebar */}
-            <motion.aside
-                initial={isMobile ? 'closed' : 'open'}
-                animate={isOpen ? 'open' : (isMobile ? 'closed' : 'closed')}
-                variants={isMobile ? sidebarVariants : desktopVariants}
+            <aside
                 className={cn(
-                    "fixed top-0 left-0 h-full bg-sidebar-background border-r border-border z-40 flex flex-col justify-between overflow-hidden",
-                    isMobile ? "w-64" : ""
+                    "fixed top-0 left-0 h-full bg-sidebar-background border-r border-border z-40 flex flex-col justify-between overflow-hidden transition-[width] duration-300 ease-in-out will-change-[width]",
+                    isMobile
+                        ? (isOpen ? "w-64" : "w-0")
+                        : (isOpen ? "w-64" : "w-[60px]")
                 )}
             >
                 <div>
                     {/* Logo Area */}
                     <div className="h-16 flex items-center justify-between px-3 border-b border-border/10">
-                        {/* Desktop Collapse Button */}
-                        {!isMobile && (
-                            <button
-                                onClick={() => setIsOpen(!isOpen)}
-                                className={cn("p-1.5 rounded-md hover:bg-neutral-800 transition-colors text-muted-foreground hover:text-foreground", !isOpen && "mx-auto")}
-                            >
-                                <VeloSidebarIcon className="w-5 h-5" />
-                            </button>
-                        )}
-
-                        <motion.div
-                            variants={titleVariants}
-                            initial={false}
-                            animate={isOpen ? "open" : "closed"}
-                            className="flex items-center gap-2 overflow-hidden whitespace-nowrap"
+                        <div
+                            className={cn(
+                                "flex items-center gap-2 overflow-hidden whitespace-nowrap transition-[opacity,transform,width] duration-300 ease-in-out",
+                                isOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0 hidden",
+                                isMobile && "ml-2"
+                            )}
                         >
                             <h1 className="font-semibold text-base">
                                 Velo Panel
                             </h1>
-                        </motion.div>
+                        </div>
+
+                        {/* Desktop Collapse Button */}
+                        {!isMobile && (
+                            <button
+                                onClick={() => setIsOpen(!isOpen)}
+                                className={cn(
+                                    "p-1.5 rounded-md hover:bg-neutral-800 transition-colors text-muted-foreground hover:text-foreground shrink-0",
+                                    !isOpen && "mx-auto"
+                                )}
+                            >
+                                <VeloSidebarIcon className="w-5 h-5" />
+                            </button>
+                        )}
                     </div>
 
                     {/* Navigation */}
@@ -137,17 +125,17 @@ export default function Sidebar() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden text-sm",
+                                        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 group relative overflow-hidden text-sm",
                                         isActive
                                             ? "bg-[var(--sidebar-selected)] text-foreground font-medium"
-                                            : "text-muted-foreground/70 hover:bg-neutral-800/50 hover:text-foreground", // Darker default, lighter hover
+                                            : "text-muted-foreground/70 hover:bg-neutral-800/50 hover:text-foreground",
                                         !isOpen && !isMobile && "justify-center px-2"
                                     )}
                                 >
-                                    <item.icon size={18} className={cn("min-w-[18px]", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} />
+                                    <item.icon size={18} className={cn("min-w-[18px] shrink-0", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} />
                                     <span className={cn(
-                                        "whitespace-nowrap transition-all duration-300 origin-left",
-                                        !isOpen && !isMobile ? "hidden" : "block"
+                                        "whitespace-nowrap transition-[opacity,transform] duration-300 origin-left",
+                                        isOpen || isMobile ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 hidden w-0"
                                     )}>
                                         {item.name}
                                     </span>
@@ -167,25 +155,27 @@ export default function Sidebar() {
                 {/* Footer / Logout */}
                 <div className="p-4 border-t border-border/10">
                     <button className={cn(
-                        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-muted-foreground/70 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 text-sm group",
+                        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-muted-foreground/70 hover:bg-red-500/10 hover:text-red-500 transition-colors duration-200 text-sm group",
                         !isOpen && !isMobile && "justify-center px-0"
                     )}>
-                        <LogoutIcon className="w-5 h-5 min-w-[20px] group-hover:text-red-500" />
+                        <LogoutIcon className="w-5 h-5 min-w-[20px] shrink-0 group-hover:text-red-500" />
                         <span className={cn(
-                            "whitespace-nowrap transition-all duration-300",
-                            !isOpen && !isMobile ? "hidden" : "block"
+                            "whitespace-nowrap transition-[opacity,transform] duration-300",
+                            isOpen || isMobile ? "opacity-100" : "opacity-0 hidden w-0"
                         )}>
                             Logout
                         </span>
                     </button>
                 </div>
-            </motion.aside>
+            </aside>
 
-            {/* Spacer for desktop content to not be hidden behind fixed sidebar */}
+            {/* Spacer for desktop content */}
             {!isMobile && (
-                <motion.div
-                    animate={isOpen ? { width: 250 } : { width: 80 }}
-                    className="shrink-0 hidden lg:block h-screen"
+                <div
+                    className={cn(
+                        "shrink-0 hidden lg:block h-screen transition-[width] duration-300 ease-in-out will-change-[width]",
+                        isOpen ? "w-64" : "w-[60px]"
+                    )}
                 />
             )}
         </>
