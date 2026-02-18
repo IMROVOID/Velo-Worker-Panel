@@ -2,10 +2,7 @@
 
 ### 🌏 Readme in [Farsi](README_fa.md)
 
-<p align="center">
-  <img src="docs/assets/images/panel-overview.jpg">
-</p>
-<br>
+
 
 ## Introduction
 
@@ -14,13 +11,7 @@ This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE
 - **Workers** deployment
 - **Pages** deployment (Velo Panel Frontend)
 
-🌟 If you found **Velo Panel** valuable, Your donations make all the difference 🌟
 
-### USDT (BEP20)
-
-```text
-0xbdf15d41C56f861f25b2b11C835bd45dfD5b792F
-```
 
 ## Features
 

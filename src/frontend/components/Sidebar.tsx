@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { VeloSidebarIcon } from './icons/VeloSidebarIcon';
 import { LogoutIcon } from './icons/LogoutIcon';
 
+const sidebarTransition = { type: "spring", stiffness: 300, damping: 30 } as const;
+
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Admins', href: '/admins', icon: Shield },
@@ -84,7 +86,7 @@ export default function Sidebar() {
             <motion.aside
                 initial={false}
                 animate={{ width: sidebarWidth }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                transition={sidebarTransition}
                 className="fixed top-0 left-0 h-full bg-sidebar-background border-r border-border z-40 flex flex-col justify-between overflow-hidden will-change-[width]"
             >
                 <div>
@@ -126,27 +128,26 @@ export default function Sidebar() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        "flex items-center gap-3 pl-6 pr-3 py-2.5 rounded-xl transition-colors duration-200 group relative overflow-hidden text-sm",
+                                        "flex items-center pl-5 pr-3 py-3 rounded-2xl transition-colors duration-200 group relative overflow-hidden text-sm",
                                         isActive
                                             ? "bg-[var(--sidebar-selected)] text-foreground font-medium"
                                             : "text-muted-foreground/70 hover:bg-neutral-800/50 hover:text-foreground"
                                     )}
                                 >
-                                    <item.icon size={20} className={cn("min-w-[20px] shrink-0 transition-colors", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} />
+                                    <item.icon size={18} className={cn("min-w-[18px] shrink-0 transition-colors", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} />
 
-                                    <AnimatePresence>
-                                        {(isOpen || isMobile) && (
-                                            <motion.span
-                                                initial={{ opacity: 0, width: 0 }}
-                                                animate={{ opacity: 1, width: "auto" }}
-                                                exit={{ opacity: 0, width: 0 }}
-                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                                className="whitespace-nowrap overflow-hidden origin-left"
-                                            >
-                                                {item.name}
-                                            </motion.span>
-                                        )}
-                                    </AnimatePresence>
+                                    <motion.span
+                                        initial={false}
+                                        animate={{
+                                            opacity: (isOpen || isMobile) ? 1 : 0,
+                                            width: (isOpen || isMobile) ? "auto" : 0,
+                                            marginLeft: (isOpen || isMobile) ? 12 : 0
+                                        }}
+                                        transition={sidebarTransition}
+                                        className="whitespace-nowrap overflow-hidden origin-left"
+                                    >
+                                        {item.name}
+                                    </motion.span>
 
                                     {/* Tooltip for collapsed state (Desktop only) */}
                                     {!isOpen && !isMobile && (
@@ -163,22 +164,21 @@ export default function Sidebar() {
                 {/* Footer / Logout */}
                 <div className="p-4 border-t border-border/10">
                     <button className={cn(
-                        "flex items-center gap-3 w-full pl-6 pr-3 py-2.5 rounded-xl text-muted-foreground/70 hover:bg-red-500/10 hover:text-red-500 transition-colors duration-200 text-sm group"
+                        "flex items-center w-full pl-5 pr-3 py-3 rounded-2xl text-muted-foreground/70 hover:bg-red-500/5 hover:text-red-500 transition-colors duration-200 text-sm group"
                     )}>
                         <LogoutIcon className="w-5 h-5 min-w-[20px] shrink-0 group-hover:text-red-500" />
-                        <AnimatePresence>
-                            {(isOpen || isMobile) && (
-                                <motion.span
-                                    initial={{ opacity: 0, width: 0 }}
-                                    animate={{ opacity: 1, width: "auto" }}
-                                    exit={{ opacity: 0, width: 0 }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                    className="whitespace-nowrap overflow-hidden"
-                                >
-                                    Logout
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: (isOpen || isMobile) ? 1 : 0,
+                                width: (isOpen || isMobile) ? "auto" : 0,
+                                marginLeft: (isOpen || isMobile) ? 12 : 0
+                            }}
+                            transition={sidebarTransition}
+                            className="whitespace-nowrap overflow-hidden"
+                        >
+                            Logout
+                        </motion.span>
                     </button>
                 </div>
             </motion.aside>
@@ -188,7 +188,7 @@ export default function Sidebar() {
                 <motion.div
                     initial={false}
                     animate={{ width: sidebarWidth }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    transition={sidebarTransition}
                     className="shrink-0 hidden lg:block h-screen will-change-[width]"
                 />
             )}
