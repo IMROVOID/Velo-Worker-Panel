@@ -3,11 +3,11 @@
 :root {
   --background: #020202;
   --foreground: #ededed;
-  --sidebar-background: #0a0a0a;
+  --sidebar-background: #0c0c0c;
   --sidebar-foreground: #ededed;
   --sidebar-selected: #171717;
 
-  --card: #141414;
+  --card: #0c0c0c;
   --card-foreground: #ededed;
   --popover: #161616;
   --popover-foreground: #ededed;
@@ -85,7 +85,7 @@
   :root {
     --background: #020202;
     --foreground: #ededed;
-    --sidebar-background: #0a0a0a;
+    --sidebar-background: #0c0c0c;
     --sidebar-foreground: #ededed;
     --sidebar-selected: #171717;
   }
