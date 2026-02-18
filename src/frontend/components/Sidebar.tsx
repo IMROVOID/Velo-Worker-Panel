@@ -50,6 +50,8 @@ export default function Sidebar() {
         if (isMobile) setIsOpen(false);
     }, [pathname, isMobile]);
 
+    const sidebarWidth = isMobile ? (isOpen ? 256 : 0) : (isOpen ? 256 : 70);
+
     return (
         <>
             {/* Mobile Toggle Button */}
@@ -79,28 +81,27 @@ export default function Sidebar() {
             </AnimatePresence>
 
             {/* Sidebar */}
-            <aside
-                className={cn(
-                    "fixed top-0 left-0 h-full bg-sidebar-background border-r border-border z-40 flex flex-col justify-between overflow-hidden transition-[width] duration-300 ease-in-out will-change-[width]",
-                    isMobile
-                        ? (isOpen ? "w-64" : "w-0")
-                        : (isOpen ? "w-64" : "w-[60px]")
-                )}
+            <motion.aside
+                initial={false}
+                animate={{ width: sidebarWidth }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="fixed top-0 left-0 h-full bg-sidebar-background border-r border-border z-40 flex flex-col justify-between overflow-hidden will-change-[width]"
             >
                 <div>
                     {/* Logo Area */}
-                    <div className="h-16 flex items-center justify-between px-3 border-b border-border/10">
-                        <div
+                    <div className="h-16 flex items-center px-4 border-b border-border/10 overflow-hidden">
+                        <motion.div
+                            animate={{ opacity: isOpen ? 1 : 0, width: isOpen ? "auto" : 0 }}
+                            transition={{ duration: 0.2 }}
                             className={cn(
-                                "flex items-center gap-2 overflow-hidden whitespace-nowrap transition-[opacity,transform,width] duration-300 ease-in-out",
-                                isOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0 hidden",
+                                "flex items-center gap-2 whitespace-nowrap",
                                 isMobile && "ml-2"
                             )}
                         >
                             <h1 className="font-semibold text-base">
                                 Velo Panel
                             </h1>
-                        </div>
+                        </motion.div>
 
                         {/* Desktop Collapse Button */}
                         {!isMobile && (
@@ -108,7 +109,7 @@ export default function Sidebar() {
                                 onClick={() => setIsOpen(!isOpen)}
                                 className={cn(
                                     "p-1.5 rounded-md hover:bg-neutral-800 transition-colors text-muted-foreground hover:text-foreground shrink-0",
-                                    !isOpen && "mx-auto"
+                                    isOpen ? "ml-auto" : "mx-auto" // Center when collapsed, right when open
                                 )}
                             >
                                 <VeloSidebarIcon className="w-5 h-5" />
@@ -128,21 +129,28 @@ export default function Sidebar() {
                                         "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 group relative overflow-hidden text-sm",
                                         isActive
                                             ? "bg-[var(--sidebar-selected)] text-foreground font-medium"
-                                            : "text-muted-foreground/70 hover:bg-neutral-800/50 hover:text-foreground",
-                                        !isOpen && !isMobile && "justify-center px-2"
+                                            : "text-muted-foreground/70 hover:bg-neutral-800/50 hover:text-foreground"
                                     )}
                                 >
-                                    <item.icon size={18} className={cn("min-w-[18px] shrink-0", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} />
-                                    <span className={cn(
-                                        "whitespace-nowrap transition-[opacity,transform] duration-300 origin-left",
-                                        isOpen || isMobile ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 hidden w-0"
-                                    )}>
-                                        {item.name}
-                                    </span>
+                                    <item.icon size={20} className={cn("min-w-[20px] shrink-0 transition-colors", isActive ? "text-foreground" : "text-muted-foreground/70 group-hover:text-foreground")} />
 
-                                    {/* Tooltip for collapsed state */}
+                                    <AnimatePresence>
+                                        {(isOpen || isMobile) && (
+                                            <motion.span
+                                                initial={{ opacity: 0, width: 0 }}
+                                                animate={{ opacity: 1, width: "auto" }}
+                                                exit={{ opacity: 0, width: 0 }}
+                                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                                className="whitespace-nowrap overflow-hidden origin-left"
+                                            >
+                                                {item.name}
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {/* Tooltip for collapsed state (Desktop only) */}
                                     {!isOpen && !isMobile && (
-                                        <div className="absolute left-full ml-2 px-2 py-1 bg-foreground text-background text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                                        <div className="absolute left-full ml-4 px-2 py-1 bg-foreground text-background text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                                             {item.name}
                                         </div>
                                     )}
@@ -155,27 +163,33 @@ export default function Sidebar() {
                 {/* Footer / Logout */}
                 <div className="p-4 border-t border-border/10">
                     <button className={cn(
-                        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-muted-foreground/70 hover:bg-red-500/10 hover:text-red-500 transition-colors duration-200 text-sm group",
-                        !isOpen && !isMobile && "justify-center px-0"
+                        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-muted-foreground/70 hover:bg-red-500/10 hover:text-red-500 transition-colors duration-200 text-sm group"
                     )}>
                         <LogoutIcon className="w-5 h-5 min-w-[20px] shrink-0 group-hover:text-red-500" />
-                        <span className={cn(
-                            "whitespace-nowrap transition-[opacity,transform] duration-300",
-                            isOpen || isMobile ? "opacity-100" : "opacity-0 hidden w-0"
-                        )}>
-                            Logout
-                        </span>
+                        <AnimatePresence>
+                            {(isOpen || isMobile) && (
+                                <motion.span
+                                    initial={{ opacity: 0, width: 0 }}
+                                    animate={{ opacity: 1, width: "auto" }}
+                                    exit={{ opacity: 0, width: 0 }}
+                                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                                    className="whitespace-nowrap overflow-hidden"
+                                >
+                                    Logout
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </button>
                 </div>
-            </aside>
+            </motion.aside>
 
             {/* Spacer for desktop content */}
             {!isMobile && (
-                <div
-                    className={cn(
-                        "shrink-0 hidden lg:block h-screen transition-[width] duration-300 ease-in-out will-change-[width]",
-                        isOpen ? "w-64" : "w-[60px]"
-                    )}
+                <motion.div
+                    initial={false}
+                    animate={{ width: sidebarWidth }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="shrink-0 hidden lg:block h-screen will-change-[width]"
                 />
             )}
         </>
