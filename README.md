@@ -58,10 +58,19 @@ The frontend is automatically deployed to GitHub Pages via GitHub Actions on pus
 - **Live URL**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
 
 #### Cloudflare Workers
-To deploy to Cloudflare Workers:
+
+**One-Command Setup & Deployment:**
+Run the interactive setup wizard:
 ```bash
-npx wrangler deploy
+npm start
 ```
+*This command handles login, configuration, and deployment automatically.*
+
+3.  **Local Development** (Optional)
+    To test the worker locally:
+    ```bash
+    npm run worker:dev
+    ```
 
 ## Getting started
 

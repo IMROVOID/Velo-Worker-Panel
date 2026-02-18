@@ -7,7 +7,11 @@
 	"type": "module",
 	"scripts": {
 		"check": "tsc --noEmit",
-		"build": "node scripts/build.js"
+		"build": "node scripts/build.js",
+		"deploy": "wrangler deploy",
+		"worker:dev": "wrangler dev",
+		"setup": "node scripts/setup.js",
+		"start": "node scripts/setup.js"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20260217.0",
@@ -17,7 +21,8 @@
 		"@types/jszip": "^3.4.0",
 		"@types/node": "^24.10.13",
 		"eslint": "^9.28.0",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"wrangler": "^3.57.1"
 	},
 	"dependencies": {
 		"esbuild": "^0.25.12",
