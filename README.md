@@ -1,4 +1,4 @@
-<h1 align="center">BPB Panel</h1>
+<h1 align="center">Velo Panel</h1>
 
 ### 🌏 Readme in [Farsi](README_fa.md)
 
@@ -12,9 +12,9 @@
 This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE **VLESS**, **Trojan** and **Warp** configs, It ensures connectivity even when domains or Warp services are blocked by ISPs, offering two deployment options:
 
 - **Workers** deployment
-- **Pages** deployment
+- **Pages** deployment (Velo Panel Frontend)
 
-🌟 If you found **BPB Panel** valuable, Your donations make all the difference 🌟
+🌟 If you found **Velo Panel** valuable, Your donations make all the difference 🌟
 
 ### USDT (BEP20)
 
@@ -49,7 +49,7 @@ cd src/frontend
 npm install
 npm run dev
 ```
-Open [http://localhost:3000/panel](http://localhost:3000/panel) to view the panel.
+Open [http://localhost:3000/Velo-Worker-Panel](http://localhost:3000/Velo-Worker-Panel) to view the panel.
 
 ### Worker Build (Production)
 To build the full project (Worker + bundled Frontend):
@@ -61,6 +61,12 @@ node scripts/build.js
 This generates `dist/worker.js` containing the logic and compressed static assets.
 
 ### Deployment
+
+#### GitHub Pages
+The frontend is automatically deployed to GitHub Pages via GitHub Actions on push to `main`.
+- **Live URL**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
+
+#### Cloudflare Workers
 To deploy to Cloudflare Workers:
 ```bash
 npx wrangler deploy
@@ -68,10 +74,10 @@ npx wrangler deploy
 
 ## Getting started
 
-- [Installation methods](https://bia-pain-bache.github.io/BPB-Worker-Panel/installation/wizard/)
-- [Configuration](https://bia-pain-bache.github.io/BPB-Worker-Panel/configuration/)
-- [How to use](https://bia-pain-bache.github.io/BPB-Worker-Panel/usage/)
-- [FAQ](https://bia-pain-bache.github.io/BPB-Worker-Panel/faq/)
+- [Installation methods](https://IMROVOID.github.io/Velo-Worker-Panel/installation/wizard/)
+- [Configuration](https://IMROVOID.github.io/Velo-Worker-Panel/configuration/)
+- [How to use](https://IMROVOID.github.io/Velo-Worker-Panel/usage/)
+- [FAQ](https://IMROVOID.github.io/Velo-Worker-Panel/faq/)
 
 ## Supported Clients
 
@@ -105,7 +111,7 @@ npx wrangler deploy
 
 ## Stargazers Over Time
 
-[![Stargazers Over Time](https://starchart.cc/bia-pain-bache/BPB-Worker-Panel.svg?variant=adaptive)](https://starchart.cc/bia-pain-bache/BPB-Worker-Panel)
+[![Stargazers Over Time](https://starchart.cc/IMROVOID/Velo-Worker-Panel.svg?variant=adaptive)](https://starchart.cc/IMROVOID/Velo-Worker-Panel)
 
 ---
 
