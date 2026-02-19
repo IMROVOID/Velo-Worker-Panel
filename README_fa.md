@@ -1,11 +1,8 @@
-<h1 align="center">پنل BPB</h1>
+# پنل BPB
 
-#### 🌏 Readme in [English](README.md)
+[🌏 Readme in English](README.md)
 
-<p align="center">
-  <img src="docs/assets/images/panel-overview.jpg">
-</p>
-<br>
+![Panel Overview](docs/assets/images/panel-overview.jpg)
 
 ## معرفی
 
@@ -50,8 +47,6 @@
 
 ## برنامه‌های پشتیبانی شده
 
-<div dir="rtl">
-
 |       Client        |     Version      | پشتیبانی از Fragment | پشتیبانی از Warp Pro |
 | :-----------------: | :--------------: | :------------------: | :------------------: |
 |     **v2rayNG**     | 1.10.26 و بالاتر |  :heavy_check_mark:  |  :heavy_check_mark:  |
@@ -66,11 +61,7 @@
 |   **AmneziaVPN**    |                  |         :x:          |  :heavy_check_mark:  |
 |    **WG Tunnel**    |                  |         :x:          |  :heavy_check_mark:  |
 
-</div>
-
 ## متغیرهای محیطی (داشبورد کلادفلر)
-
-<div dir="rtl">
 
 |  نام متغیر   |           مورد استفاده            |       اجباری       |
 | :----------: | :-------------------------------: | :----------------: |
@@ -81,8 +72,6 @@
 | **SUB_PATH** |     مسیر لینک‌های اشتراک شخصی     |        :x:         |
 | **FALLBACK** | دامنه‌ی پوششی برای VLESS و Trojan |        :x:         |
 | **DOH_URL**  |    DOH برای عملیات داخلی ورکر     |        :x:         |
-
-</div>
 
 ---
 
