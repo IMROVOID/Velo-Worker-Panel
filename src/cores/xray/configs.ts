@@ -270,29 +270,35 @@ export async function getXrCustomConfigs(isFragment: boolean): Promise<Response>
 
     for (const protocol of protocols) {
         let protocolIndex = 1;
-        for (const port of totalPorts) {
-            for (const addr of Addresses) {
-                const outbound = buildWebsocketOutbound(protocol, addr, port, isFragment);
-                const outbounds = [outbound, ...fragment];
+        const { vlessUsers, trojanUsers } = globalThis.settings;
+        const { _VL_ } = globalThis.dict;
+        const users = protocol === _VL_ ? vlessUsers : trojanUsers;
 
-                const proxy = modifyOutbound(outbound, `proxy-${index}`);
-                proxies.push(proxy);
+        for (const user of users) {
+            for (const port of totalPorts) {
+                for (const addr of Addresses) {
+                    const outbound = buildWebsocketOutbound(protocol, addr, port, isFragment, user);
+                    const outbounds = [outbound, ...fragment];
 
-                const remark = generateRemark(protocolIndex, port, addr, protocol, isFragment, false);
-                const config = await buildConfig(remark, outbounds, false, false, false, false, false, [addr]);
-                configs.push(config);
+                    const proxy = modifyOutbound(outbound, `proxy-${index}`);
+                    proxies.push(proxy);
 
-                if (chainProxy) {
-                    const remark = generateRemark(protocolIndex, port, addr, protocol, isFragment, true);
-                    const chainConfig = await buildConfig(remark, [chainProxy, ...outbounds], false, true, false, false, false, [addr]);
-                    configs.push(chainConfig);
+                    const remark = generateRemark(protocolIndex, port, addr, protocol, isFragment, false);
+                    const config = await buildConfig(remark, outbounds, false, false, false, false, false, [addr]);
+                    configs.push(config);
 
-                    const chain = modifyOutbound(chainProxy, `chain-${index}`, `proxy-${index}`);
-                    chains.push(chain);
+                    if (chainProxy) {
+                        const remark = generateRemark(protocolIndex, port, addr, protocol, isFragment, true);
+                        const chainConfig = await buildConfig(remark, [chainProxy, ...outbounds], false, true, false, false, false, [addr]);
+                        configs.push(chainConfig);
+
+                        const chain = modifyOutbound(chainProxy, `chain-${index}`, `proxy-${index}`);
+                        chains.push(chain);
+                    }
+
+                    protocolIndex++;
+                    index++;
                 }
-
-                protocolIndex++;
-                index++;
             }
         }
     }

@@ -40,6 +40,8 @@ globalThis.settings = {
     bestVLTRInterval: 30,
     VLConfigs: true,
     TRConfigs: true,
+    vlessUsers: [],
+    trojanUsers: [],
     ports: [443],
     fingerprint: "chrome",
     enableTFO: false,
@@ -106,6 +108,10 @@ globalThis.settings = {
 export async function setSettings(request: Request, env: Env) {
     const dataset = await getDataset(request, env);
     globalThis.settings = dataset.settings;
+
+    // Backward compatibility: ensure arrays exist
+    if (!globalThis.settings.vlessUsers) globalThis.settings.vlessUsers = [env.UUID];
+    if (!globalThis.settings.trojanUsers) globalThis.settings.trojanUsers = [env.TR_PASS];
 }
 
 export function init(request: Request, env: Env) {

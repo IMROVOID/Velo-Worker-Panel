@@ -7,7 +7,8 @@ import {
 	logout,
 	renderError,
 	handleWebsocket,
-	handleDoH
+	handleDoH,
+	handleApi
 } from '@handlers';
 
 export default {
@@ -39,6 +40,9 @@ export default {
 
 					case `dns-query`:
 						return await handleDoH(request);
+
+					case 'api':
+						return await handleApi(request, env);
 
 
 

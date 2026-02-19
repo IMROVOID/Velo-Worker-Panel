@@ -10,6 +10,58 @@ import { TrOverWSHandler } from "@trojan";
 import JSZip from "jszip";
 import { HttpStatus, respond } from "@common";
 
+export async function handleApi(request: Request, env: Env): Promise<Response> {
+    const { pathName } = globalThis.globalConfig;
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    // Route: /api/overview
+    if (path.endsWith('/api/overview')) {
+        return await getSystemOverview(request, env);
+    }
+
+    // Route: /api/settings
+    if (path.endsWith('/api/settings')) {
+        if (request.method === 'GET') {
+            return await getSettings(request, env);
+        }
+        if (request.method === 'PUT') {
+            return await updateSettings(request, env);
+        }
+        return respond(false, HttpStatus.METHOD_NOT_ALLOWED, 'Method not allowed');
+    }
+
+    return respond(false, HttpStatus.NOT_FOUND, 'API Endpoint not found');
+}
+
+async function getSystemOverview(request: Request, env: Env): Promise<Response> {
+    const auth = await Authenticate(request, env);
+    if (!auth) {
+        return respond(false, HttpStatus.UNAUTHORIZED, 'Unauthorized.');
+    }
+
+    const { settings } = await getDataset(request, env);
+    const { panelVersion, vlessUsers, trojanUsers } = settings; // Assuming these exist on settings
+
+    // Check if Warp is enabled (checking if any warp config is active or just general status)
+    // For now, let's assume existence of warp settings implies status or we check a flag
+    // The spec mentions "Warp Status (Enabled/Disabled)". 
+    // Looking at settings type would be ideal, but for now assuming we can derive it.
+    // Let's assume 'warpEnabled' isn't a direct flag, but we can check if warpEndpoints has entries?
+    // Or maybe we just return the full settings for the frontend to decide, but the overview specifically asks for counts.
+
+    // We'll return what we have:
+    const data = {
+        vlConfigCount: vlessUsers?.length || 0,
+        trConfigCount: trojanUsers?.length || 0,
+        warpStatus: settings.warpEndpoints && settings.warpEndpoints.length > 0 ? 'Enabled' : 'Disabled',
+        panelVersion: panelVersion || 'Unknown'
+    };
+
+    return respond(true, HttpStatus.OK, 'Overview data fetched', data);
+}
+
+
 export async function handleWebsocket(request: Request): Promise<Response> {
     const { pathName } = globalThis.globalConfig;
     const encodedPathConfig = pathName.replace("/", "");

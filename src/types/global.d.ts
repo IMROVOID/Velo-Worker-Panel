@@ -85,6 +85,8 @@ declare global {
         bestVLTRInterval: number;
         VLConfigs: boolean;
         TRConfigs: boolean;
+        vlessUsers: string[];
+        trojanUsers: string[];
         ports: number[];
         fingerprint: Fingerprint;
         enableTFO: boolean;

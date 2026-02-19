@@ -118,7 +118,8 @@ export function buildWebsocketOutbound(
     protocol: string,
     address: string,
     port: number,
-    isFragment: boolean
+    isFragment: boolean,
+    credential?: string
 ): Outbound {
     const {
         settings: {
@@ -127,19 +128,21 @@ export function buildWebsocketOutbound(
             enableECH,
             echConfig
         },
-        globalConfig: { userID, TrPass },
+        globalConfig: { userID: defaultUUID, TrPass: defaultPass },
         dict: { _VL_ }
     } = globalThis;
+
+    const user = credential || (protocol === _VL_ ? defaultUUID : defaultPass);
 
     const isTLS = isHttps(port);
     const { host, sni, allowInsecure } = selectSniHost(address);
     const tlsSettings = isTLS ? buildTlsSettings(
-            sni,
-            fingerprint,
-            "http/1.1",
-            allowInsecure,
-            enableECH && !isFragment ? echConfig : undefined
-        ) : undefined;
+        sni,
+        fingerprint,
+        "http/1.1",
+        allowInsecure,
+        enableECH && !isFragment ? echConfig : undefined
+    ) : undefined;
 
     const streamSettings: StreamSettings = {
         network: "ws",
@@ -157,7 +160,7 @@ export function buildWebsocketOutbound(
             port,
             users: [
                 {
-                    id: userID,
+                    id: user,
                     encryption: "none"
                 }
             ]
@@ -168,7 +171,7 @@ export function buildWebsocketOutbound(
         servers: [{
             address,
             port,
-            password: TrPass
+            password: user
         }]
     }, streamSettings);
 }
