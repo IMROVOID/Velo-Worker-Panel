@@ -69,7 +69,7 @@ The frontend is automatically deployed to GitHub Pages via GitHub Actions on pus
 Run the interactive setup wizard:
 
 ```bash
-npm start
+npm run setup
 ```
 
 *This command handles login, custom naming, configuration, and deployment automatically.*
