@@ -88,11 +88,18 @@ export async function handlePanel(request: Request, env: Env): Promise<Response>
     // If pathName is "/secret/panel", and request is "/secret/panel/dashboard",
     // we want "/dashboard.html".
 
-    const { pathName } = globalThis.globalConfig;
-    if (pathname.startsWith(pathName)) {
-        pathname = pathname.slice(pathName.length);
-    } else if (pathname.startsWith('/panel')) {
-        pathname = pathname.slice('/panel'.length);
+    // Fix: The previous logic used globalConfig.pathName (full request path) to strip, 
+    // resulting in an empty string for every request.
+    // We need to strip the prefix up to and including /panel.
+
+    // Find where '/panel' starts
+    const panelIndex = pathname.indexOf('/panel');
+    if (panelIndex !== -1) {
+        // Slice everything up to the end of '/panel'
+        pathname = pathname.slice(panelIndex + '/panel'.length);
+    } else {
+        // If /panel is not found (unlikely given routing), keeping original pathname might be safer 
+        // or we default to root if it logic demands it. Use original for now.
     }
 
     if (pathname === '' || pathname === '/') {
@@ -125,12 +132,16 @@ export async function handlePanel(request: Request, env: Env): Promise<Response>
         return new Response("Not Found", { status: 404 });
     }
 
-    const body = Uint8Array.from(atob(contentBase64), c => c.charCodeAt(0));
+    // Decompress the asset on the fly
+    // This ensures the browser receives plain text/html/css/js
+    // and avoids issues where Content-Encoding headers are stripped or mishandled
+    const compressedBytes = Uint8Array.from(atob(contentBase64), c => c.charCodeAt(0));
+    const stream = new Blob([compressedBytes]).stream().pipeThrough(new DecompressionStream('gzip'));
 
-    return new Response(body, {
+    return new Response(stream, {
         headers: {
             'Content-Type': getMimeType(assetKey),
-            'Content-Encoding': 'gzip',
+            // Removed 'Content-Encoding': 'gzip' because we are serving decompressed content
             'Cache-Control': 'public, max-age=86400',
         },
         status: assetKey === '/404.html' ? 404 : 200

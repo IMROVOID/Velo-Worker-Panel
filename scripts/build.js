@@ -46,7 +46,9 @@ async function processNextJsAssets() {
         // Actually, just simple replacement is safer
         const normalizedPath = '/' + relativePath.replace(/\\/g, '/');
 
-        result[normalizedPath] = JSON.stringify(base64);
+        // key matching logic in worker seems to rely on exact paths or appending .html
+        // We store it directly as string
+        result[normalizedPath] = base64;
     }
 
     console.log(`${success} Next.js assets bundled successfuly!`);
@@ -93,7 +95,7 @@ async function buildWorker() {
         target: 'esnext',
         loader: { '.ts': 'ts' },
         define: {
-            __STATIC_ASSETS__: assetsString,
+            __STATIC_ASSETS__: JSON.stringify(assetsString),
             __VERSION__: JSON.stringify(version)
         }
     });

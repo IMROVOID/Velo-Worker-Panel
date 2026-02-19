@@ -1,8 +1,6 @@
-<h1 align="center">Velo Panel</h1>
+# Velo Panel
 
-### 🌏 Readme in [Farsi](README_fa.md)
-
-
+## 🌏 Readme in [Farsi](README_fa.md)
 
 ## Introduction
 
@@ -10,8 +8,6 @@ This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE
 
 - **Workers** deployment
 - **Pages** deployment (Velo Panel Frontend)
-
-
 
 ## Features
 
@@ -25,6 +21,7 @@ This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE
 8. **Broad client compatibility:** Offers subscription links for Xray, Sing-box and Clash-Mihomo core clients.
 9. **Password-protected panel:** Provides secure and private panel with password protection.
 10. **Fully customizable:** Supports setting up clean IP-domains, Proxy IPs, DNS servers, choosing ports and protocols, Warp endpoints and more.
+11. **Custom Branding:** Option to set custom names for Worker and KV storage during setup.
 
 ## Limitations
 
@@ -34,43 +31,56 @@ This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE
 ## Development & Build
 
 ### Frontend Development (Next.js)
+
 To run the frontend locally for UI development:
+
 ```bash
 cd src/frontend
 npm install
 npm run dev
 ```
+
 Open [http://localhost:3000/Velo-Worker-Panel](http://localhost:3000/Velo-Worker-Panel) to view the panel.
 
 ### Worker Build (Production)
+
 To build the full project (Worker + bundled Frontend):
+
 ```bash
 # In the root directory
 npm install
 node scripts/build.js
 ```
+
 This generates `dist/worker.js` containing the logic and compressed static assets.
 
 ### Deployment
 
 #### GitHub Pages
+
 The frontend is automatically deployed to GitHub Pages via GitHub Actions on push to `main`.
+
 - **Live URL**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
 
 #### Cloudflare Workers
 
 **One-Command Setup & Deployment:**
+
 Run the interactive setup wizard:
+
 ```bash
 npm start
 ```
-*This command handles login, configuration, and deployment automatically.*
 
-3.  **Local Development** (Optional)
-    To test the worker locally:
-    ```bash
-    npm run worker:dev
-    ```
+*This command handles login, custom naming, configuration, and deployment automatically.*
+
+**Local Development** (Optional)
+
+To test the worker locally:
+
+```bash
+npm run worker:dev
+```
 
 ## Getting started
 
