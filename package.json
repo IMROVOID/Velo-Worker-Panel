@@ -9,7 +9,7 @@
 		"check": "tsc --noEmit",
 		"build": "node scripts/build.js",
 		"deploy": "wrangler deploy",
-		"worker:dev": "wrangler dev",
+		"worker:dev": "node scripts/dev.js",
 		"setup": "node scripts/setup.js",
 		"start": "node scripts/setup.js"
 	},
@@ -25,6 +25,7 @@
 		"wrangler": "^4.67.0"
 	},
 	"dependencies": {
+		"@radix-ui/react-label": "^2.1.8",
 		"esbuild": "^0.27.3",
 		"glob": "^13.0.6",
 		"globals": "^17.3.0",

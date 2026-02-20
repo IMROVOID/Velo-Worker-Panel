@@ -15,6 +15,19 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // Route: /api/env-status
+    if (path.endsWith('/api/env-status')) {
+        const { UUID, TR_PASS } = env;
+        return respond(true, HttpStatus.OK, 'Env status fetched', {
+            isSetup: !!(UUID && TR_PASS)
+        });
+    }
+
+    // Route: /login/authenticate
+    if (path.endsWith('/login/authenticate')) {
+        return await generateJWTToken(request, env);
+    }
+
     // Route: /api/overview
     if (path.endsWith('/api/overview')) {
         return await getSystemOverview(request, env);
@@ -29,6 +42,11 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
             return await updateSettings(request, env);
         }
         return respond(false, HttpStatus.METHOD_NOT_ALLOWED, 'Method not allowed');
+    }
+
+    // Route: /api/admins
+    if (path.endsWith('/api/admins')) {
+        return await getAdmins(request, env);
     }
 
     return respond(false, HttpStatus.NOT_FOUND, 'API Endpoint not found');
@@ -59,6 +77,25 @@ async function getSystemOverview(request: Request, env: Env): Promise<Response> 
     };
 
     return respond(true, HttpStatus.OK, 'Overview data fetched', data);
+}
+
+async function getAdmins(request: Request, env: Env): Promise<Response> {
+    const auth = await Authenticate(request, env);
+    if (!auth) {
+        return respond(false, HttpStatus.UNAUTHORIZED, 'Unauthorized.');
+    }
+
+    const { userID } = globalThis.globalConfig;
+
+    const admin = {
+        id: 1,
+        username: userID || 'admin',
+        role: 'Super Admin',
+        usage: 'Unlimited',
+        status: 'Active'
+    };
+
+    return respond(true, HttpStatus.OK, 'Admins fetched', [admin]);
 }
 
 

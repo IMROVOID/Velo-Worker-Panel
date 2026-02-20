@@ -6,11 +6,31 @@ export async function generateJWTToken(request: Request, env: Env): Promise<Resp
         return respond(false, 405, 'Method not allowed.');
     }
 
-    const password = await request.text();
+    let username, password;
+    try {
+        const body = await request.json() as any;
+        username = body.username;
+        password = body.password;
+    } catch (e) {
+        return respond(false, HttpStatus.BAD_REQUEST, 'Invalid request body.');
+    }
+
+    if (!username || !password) {
+        return respond(false, HttpStatus.BAD_REQUEST, 'Username and Password are required.');
+    }
+
+    const { userID, TrPass } = globalThis.globalConfig;
     const savedPass = await env.kv.get('pwd');
 
-    if (password !== savedPass) {
-        return respond(false, HttpStatus.UNAUTHORIZED, 'Wrong password.');
+    // Default username is the UUID if not set otherwise (but logic implies UUID is the admin ID)
+    // If globalConfig.userID is not set (unlikely via setup), we might fallback, but setup guarantees it.
+    if (username !== userID) {
+        return respond(false, HttpStatus.UNAUTHORIZED, 'Invalid Username.');
+    }
+
+    const validPassword = savedPass || TrPass;
+    if (password !== validPassword) {
+        return respond(false, HttpStatus.UNAUTHORIZED, 'Invalid Password.');
     }
 
     let secretKey = await env.kv.get('secretKey');
@@ -21,7 +41,6 @@ export async function generateJWTToken(request: Request, env: Env): Promise<Resp
     }
 
     const secret = new TextEncoder().encode(secretKey);
-    const { userID } = globalThis.globalConfig;
 
     const jwtToken = await new SignJWT({ userID })
         .setProtectedHeader({ alg: 'HS256' })
@@ -29,9 +48,9 @@ export async function generateJWTToken(request: Request, env: Env): Promise<Resp
         .setExpirationTime('24h')
         .sign(secret);
 
-    return respond(true, HttpStatus.OK, 'Successfully generated Auth token', null, {
-        'Set-Cookie': `jwtToken=${jwtToken}; HttpOnly; Secure; Max-Age=${7 * 24 * 60 * 60}; Path=/; SameSite=Strict`,
-        'Content-Type': 'text/plain',
+    return respond(true, HttpStatus.OK, 'Successfully logged in', null, {
+        'Set-Cookie': `jwtToken=${jwtToken}; HttpOnly; Secure; Max-Age=${24 * 60 * 60}; Path=/; SameSite=Strict`,
+        'Content-Type': 'application/json',
     });
 }
 

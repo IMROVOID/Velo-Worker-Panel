@@ -52,6 +52,11 @@ export default function Sidebar() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
+    // Hide sidebar on login page
+    if (pathname === '/login' || pathname === '/panel/login') {
+        return null;
+    }
+
     const sidebarWidth = isMobile ? (isOpen ? 256 : 0) : (isOpen ? 256 : 70);
 
     return (

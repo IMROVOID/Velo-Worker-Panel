@@ -28,6 +28,64 @@ This project is aimed to provide a user panel to access FREE, SECURE and PRIVATE
 1. **UDP transport**: VLESS and Trojan protocols on workers do not handle **UDP** properly, so it is disabled by default (affecting features like Telegram video calls), UDP DNS is also unsupported. DoH is enabled by default for enhanced security.
 2. **Request limit**: each worker supports 100K requests per day for VLESS and Trojan, suitable for 2-3 users. You can use limitless Warp configs.
 
+## Installation & Deployment
+
+### Cloudflare Workers Deployment
+
+Here are two ways to deploy your worker. The **Easy** method is highly recommended for everyone.
+
+**Prerequisites:**
+Before you begin, ensure you have [Node.js](https://nodejs.org/en/download/) installed on your computer.
+Open your terminal (or command prompt), clone or download this repository, navigate to the folder, and install the required packages:
+
+```bash
+# 1. Open the project folder
+# 2. Install dependencies (First time only)
+npm install
+```
+
+#### Method 1: Easy Setup & Deployment (Recommended)
+
+We have included an interactive wizard that handles everything for you automatically—from logging in to Cloudflare, generating secure credentials, and deploying the panel.
+
+```bash
+npm run setup
+```
+
+*Just follow the prompts on your screen!*
+
+#### Method 2: Manual Installation
+
+If you prefer to configure everything yourself from the Cloudflare Dashboard:
+
+1. Build the unified Worker file by running `npm run build`. This generates a `dist/worker.js` file.
+2. Go to your [Cloudflare Dashboard](https://dash.cloudflare.com) and create a new **Worker**.
+3. Copy the contents of `dist/worker.js` and paste it into your new Worker's code editor, then deploy it.
+4. Go to **Workers & Pages** -> **KV** and create a new namespace (e.g., `secure-storage`).
+5. Go back to your Worker's **Settings** -> **Variables**, and under **KV Namespace Bindings**, add a binding named `kv` pointing to the namespace you just created.
+6. Open your Worker's URL (e.g. `https://your-worker.subdomain.workers.dev/panel`).
+7. **Don't worry about setting up passwords just yet!** The panel is smart enough to detect that you haven't set up the `UUID` and `TR_PASS` environment variables. It will automatically generate secure credentials for you and show you exactly how to copy and paste them into your Cloudflare Dashboard's Environment Variables section.
+
+#### Local Development (Optional)
+
+To test the worker locally with a live-reloading panel and pinned credentials:
+
+```bash
+npm run worker:dev
+```
+
+### GitHub Pages
+
+The frontend is automatically deployed to GitHub Pages via GitHub Actions on push to `main`.
+
+- **Live URL**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
+
+## Getting started
+
+- [Installation methods](https://IMROVOID.github.io/Velo-Worker-Panel/installation/wizard/)
+- [Configuration](https://IMROVOID.github.io/Velo-Worker-Panel/configuration/)
+- [How to use](https://IMROVOID.github.io/Velo-Worker-Panel/usage/)
+
 ## Development & Build
 
 ### Frontend Development (Next.js)
@@ -53,41 +111,6 @@ node scripts/build.js
 ```
 
 This generates `dist/worker.js` containing the logic and compressed static assets.
-
-### Deployment
-
-#### GitHub Pages
-
-The frontend is automatically deployed to GitHub Pages via GitHub Actions on push to `main`.
-
-- **Live URL**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
-
-#### Cloudflare Workers
-
-**One-Command Setup & Deployment:**
-
-Run the interactive setup wizard:
-
-```bash
-npm run setup
-```
-
-*This command handles login, custom naming, configuration, and deployment automatically.*
-
-**Local Development** (Optional)
-
-To test the worker locally:
-
-```bash
-npm run worker:dev
-```
-
-## Getting started
-
-- [Installation methods](https://IMROVOID.github.io/Velo-Worker-Panel/installation/wizard/)
-- [Configuration](https://IMROVOID.github.io/Velo-Worker-Panel/configuration/)
-- [How to use](https://IMROVOID.github.io/Velo-Worker-Panel/usage/)
-- [FAQ](https://IMROVOID.github.io/Velo-Worker-Panel/faq/)
 
 ## Supported Clients
 

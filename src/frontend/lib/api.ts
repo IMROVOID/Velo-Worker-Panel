@@ -15,6 +15,14 @@ export interface Settings {
     [key: string]: unknown;
 }
 
+export interface Admin {
+    id: number;
+    username: string;
+    role: string;
+    usage: string;
+    status: string;
+}
+
 class ApiClient {
     private getBasePath(): string {
         if (typeof window === 'undefined') return '';
@@ -25,6 +33,7 @@ class ApiClient {
         const url = `${this.getBasePath()}/${endpoint}`;
         const response = await fetch(url, {
             ...options,
+            credentials: 'include', // Important: Send cookies with requests
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers,
@@ -57,6 +66,10 @@ class ApiClient {
             method: 'PUT',
             body: JSON.stringify(settings),
         });
+    }
+
+    async getAdmins(): Promise<Admin[]> {
+        return this.request<Admin[]>('admins');
     }
 }
 

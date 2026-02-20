@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+"use client";
+
 import {
     Table,
     TableBody,
@@ -9,21 +9,27 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, MoreHorizontal } from "lucide-react";
-
-const admins = [
-    { id: 1, username: "thegodfather", role: "Full Access", usage: "1.17 GB", status: "Active" },
-    { id: 2, username: "support_agent", role: "Standard", usage: "250 MB", status: "Active" },
-];
+import { Search } from "lucide-react"; // Removed Plus, MoreHorizontal
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { api, Admin } from "@/lib/api";
 
 export default function AdminsPage() {
+    const [admins, setAdmins] = useState<Admin[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        api.getAdmins()
+            .then(setAdmins)
+            .catch((err) => setError(err.message))
+            .finally(() => setLoading(false));
+    }, []);
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold tracking-tight">Admins</h1>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" /> Add Admin
-                </Button>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -33,6 +39,7 @@ export default function AdminsPage() {
                         type="search"
                         placeholder="Search admins..."
                         className="pl-8"
+                        disabled
                     />
                 </div>
             </div>
@@ -45,27 +52,42 @@ export default function AdminsPage() {
                             <TableHead>Role</TableHead>
                             <TableHead>Usage</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            {/* <TableHead className="text-right">Actions</TableHead> */}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {admins.map((admin) => (
-                            <TableRow key={admin.id}>
-                                <TableCell className="font-medium">{admin.username}</TableCell>
-                                <TableCell>{admin.role}</TableCell>
-                                <TableCell>{admin.usage}</TableCell>
-                                <TableCell>
-                                    <Badge variant={admin.status === "Active" ? "success" : "secondary"}>
-                                        {admin.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center h-24">
+                                    Loading...
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ) : error ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center h-24 text-red-500">
+                                    {error}
+                                </TableCell>
+                            </TableRow>
+                        ) : admins.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center h-24">
+                                    No admins found.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            admins.map((admin) => (
+                                <TableRow key={admin.id}>
+                                    <TableCell className="font-medium">{admin.username}</TableCell>
+                                    <TableCell>{admin.role}</TableCell>
+                                    <TableCell>{admin.usage}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={admin.status === "Active" ? "success" : "secondary"}>
+                                            {admin.status}
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>

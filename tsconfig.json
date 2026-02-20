@@ -35,6 +35,9 @@
             "@handlers": [
                 "common/handlers"
             ],
+            "@auth": [
+                "auth.ts"
+            ],
             "@init": [
                 "common/init"
             ],

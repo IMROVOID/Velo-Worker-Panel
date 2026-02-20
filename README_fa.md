@@ -28,6 +28,64 @@
 1. **انتقال UDP**: پروتکل‌های VLESS و Trojan روی Workerها به درستی از **UDP** پشتیبانی نمی‌کنند، بنابراین به طور پیش‌فرض غیرفعال است (که بر ویژگی‌هایی مانند تماس تصویری تلگرام تأثیر می‌گذارد). DNS از نوع UDP نیز پشتیبانی نمی‌شود. DoH برای امنیت بیشتر به طور پیش‌فرض فعال است.
 2. **محدودیت درخواست**: هر Worker روزانه از 100 هزار درخواست برای VLESS و Trojan پشتیبانی می‌کند که برای 2-3 کاربر مناسب است. می‌توانید از کانفیگ‌های Warp بدون محدودیت استفاده کنید.
 
+## استقرار و نصب
+
+### استقرار روی Cloudflare Workers
+
+در اینجا دو روش برای استقرار پنل شما وجود دارد. روش **آسان (Easy)** برای همه کاربران به شدت توصیه می‌شود.
+
+**پیش‌نیازها:**
+قبل از شروع، مطمئن شوید که [Node.js](https://nodejs.org/en/download/) را روی کامپیوتر خود نصب کرده‌اید.
+ترمینال (یا Command Prompt) خود را باز کنید، این مخزن را دانلود یا کلون کنید، وارد پوشه پروژه شوید و پکیج‌های مورد نیاز را نصب کنید:
+
+```bash
+# 1. ورود به پوشه پروژه
+# 2. نصب پیشنیازها (فقط برای بار اول)
+npm install
+```
+
+#### روش اول: نصب و استقرار آسان (توصیه شده)
+
+ما یک ویزارد تعاملی تعبیه کرده‌ایم که صفر تا صد کارها را به صورت خودکار برای شما انجام می‌دهد — از ورود به حساب Cloudflare گرفته تا تولید رمزهای عبور امن و استقرار نهایی پنل.
+
+```bash
+npm run setup
+```
+
+*فقط کافیست دستورالعمل‌های روی صفحه ترمینال را دنبال کنید!*
+
+#### روش دوم: نصب دستی
+
+اگر ترجیح می‌دهید همه‌چیز را خودتان از طریق داشبورد کلودفلر (Cloudflare Dashboard) پیکربندی کنید:
+
+1. ابتدا با اجرای دستور `npm run build` فایل نهایی Worker را بسازید. این کار فایل `dist/worker.js` را تولید می‌کند.
+2. به [داشبورد کلودفلر](https://dash.cloudflare.com) خود بروید و یک **Worker** جدید ایجاد کنید.
+3. کدهای داخل فایل `dist/worker.js` را کپی کرده و در ویرایشگر کد Worker خود جایگذاری (Paste) و مستقر کنید.
+4. به بخش **Workers & Pages** -> **KV** بروید و یک فضای نام (Namespace) جدید ایجاد کنید (مثلاً `secure-storage`).
+5. به بخش **Settings** -> **Variables** در Worker خود بروید و در قسمت **KV Namespace Bindings**، یک اتصال جدید با نام `kv` ایجاد کنید و آن را به فضای نامی که به تازگی ساختید متصل کنید.
+6. آدرس پنل Worker خود را (مثلاً `https://your-worker.subdomain.workers.dev/panel`) در مرورگر باز کنید.
+7. **نیازی نیست نگران تنظیم رمز عبور باشید!** پنل کاربری به حدی هوشمند است که بلافاصله متوجه می‌شود شما متغیرهای محیطی `UUID` و `TR_PASS` را تنظیم نکرده‌اید. سپس پنل به طور خودکار رمزهای عبور امنی برای شما تولید کرده و دقیقاً به شما آموزش می‌دهد که چگونه آن‌ها را کپی کرده و در بخش Environment Variables کلودفلر جایگذاری کنید.
+
+#### توسعه محلی (اختیاری)
+
+برای تست محلی Worker همراه با پنل زنده و نمایش رمزهای عبور پین‌شده در پایین صفحه:
+
+```bash
+npm run worker:dev
+```
+
+### GitHub Pages
+
+فرانت‌اند به طور خودکار از طریق GitHub Actions با هر push به `main` روی GitHub Pages مستقر می‌شود.
+
+- **آدرس زنده**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
+
+## شروع به کار
+
+- [روش‌های نصب](https://IMROVOID.github.io/Velo-Worker-Panel/installation/wizard/)
+- [پیکربندی](https://IMROVOID.github.io/Velo-Worker-Panel/configuration/)
+- [نحوه استفاده](https://IMROVOID.github.io/Velo-Worker-Panel/usage/)
+
 ## توسعه و بیلد
 
 ### توسعه فرانت‌اند (Next.js)
@@ -54,41 +112,6 @@ node scripts/build.js
 
 این دستور فایل `dist/worker.js` را که حاوی منطق و فایل‌های استاتیک فشرده شده است، تولید می‌کند.
 
-### استقرار (Deployment)
-
-#### GitHub Pages
-
-فرانت‌اند به طور خودکار از طریق GitHub Actions با هر push به `main` روی GitHub Pages مستقر می‌شود.
-
-- **آدرس زنده**: [https://IMROVOID.github.io/Velo-Worker-Panel/](https://IMROVOID.github.io/Velo-Worker-Panel/)
-
-#### Cloudflare Workers
-
-**نصب و استقرار با یک دستور:**
-
-ویزارد نصب تعاملی را اجرا کنید:
-
-```bash
-npm run setup
-```
-
-*این دستور ورود، نام‌گذاری سفارشی، پیکربندی و استقرار را به طور خودکار انجام می‌دهد.*
-
-**توسعه محلی** (اختیاری)
-
-برای تست Worker به صورت محلی:
-
-```bash
-npm run worker:dev
-```
-
-## شروع به کار
-
-- [روش‌های نصب](https://IMROVOID.github.io/Velo-Worker-Panel/installation/wizard/)
-- [پیکربندی](https://IMROVOID.github.io/Velo-Worker-Panel/configuration/)
-- [نحوه استفاده](https://IMROVOID.github.io/Velo-Worker-Panel/usage/)
-- [سوالات متداول](https://IMROVOID.github.io/Velo-Worker-Panel/faq/)
-
 ## کلاینت‌های پشتیبانی شده
 
 |       کلاینت        |      نسخه      |  پشتیبانی از Fragment  |  پشتیبانی از Warp Pro  |
@@ -107,15 +130,15 @@ npm run worker:dev
 
 ## متغیرهای محیطی
 
-|   متغیر   |               کاربرد                |     اجباری      |
-| :----------: | :--------------------------------: | :----------------: |
+|   متغیر      |               کاربرد               |     اجباری     |
+| :----------: | :--------------------------------: | :------------: |
 |   **UUID**   |             VLESS UUID             | :heavy_check_mark: |
 | **TR_PASS**  |          Trojan Password           | :heavy_check_mark: |
-| **PROXY_IP** | IP یا دامنه پروکسی (VLESS, Trojan) |        :x:         |
-|  **PREFIX**  |   NAT64 Prefixes (VLESS, Trojan)   |        :x:         |
-| **SUB_PATH** |         Subscriptions' URI         |        :x:         |
-| **FALLBACK** |  دامنه Fallback (VLESS, Trojan)   |        :x:         |
-| **DOH_URL**  |              Core DOH              |        :x:         |
+| **PROXY_IP** | IP یا دامنه پروکسی (VLESS, Trojan) |        :x:     |
+|  **PREFIX**  |   NAT64 Prefixes (VLESS, Trojan)   |        :x:     |
+| **SUB_PATH** |         Subscriptions' URI         |        :x:     |
+| **FALLBACK** |  دامنه Fallback (VLESS, Trojan)   |        :x:     |
+| **DOH_URL**  |              Core DOH              |        :x:     |
 
 ---
 

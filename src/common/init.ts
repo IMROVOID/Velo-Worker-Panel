@@ -147,7 +147,7 @@ export function initHttp(request: Request, env: any) {
     const { UUID, TR_PASS, SUB_PATH, kv } = env;
     const { pathname, origin, searchParams, hostname } = new URL(request.url);
 
-    if (!['/secrets', '/favicon.ico'].includes(decodeURIComponent(pathname))) {
+    if (!['/secrets', '/favicon.ico', '/panel/login', '/api/env-status'].includes(decodeURIComponent(pathname))) {
         if (!UUID || !TR_PASS) throw new Error(`Please set ${_VL_CAP_} UUID and ${_TR_CAP_} password first. Visit <a href="${origin}/secrets" target="_blank">here</a> to generate them.`, { cause: "init" });
         if (!isValidUUID(UUID)) throw new Error(`Invalid UUID: ${UUID}`, { cause: "init" });
         if (typeof kv !== 'object') throw new Error(`KV Dataset is not properly set! Please refer to <a href="${_website_}" target="_blank">tutorials</a>.`, { cause: "init" });

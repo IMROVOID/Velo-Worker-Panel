@@ -25,7 +25,7 @@ export default function RootLayout({
         className={`${roboto.variable} antialiased flex min-h-screen bg-background text-foreground`}
       >
         <Sidebar />
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto h-screen">
+        <main className="flex-1 p-0 lg:p-0 overflow-y-auto h-screen">
           {children}
         </main>
       </body>
